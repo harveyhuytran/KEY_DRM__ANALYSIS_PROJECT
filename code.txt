@@ -1,0 +1,25 @@
+select 
+	format(cast(bhd.date AS DATE),'dddd') AS dates,
+	count(DISTINCT bhd.CustomerID) AS total_key,
+	"BHD" AS Film
+FROM c4_keydrm_log_bhd_movieid bhd
+LEFT JOIN c4_keydrm_mv_propertiesshowvn mv ON mv.id = bhd.MovieID
+WHERE mv.isDRM = 1
+GROUP BY dates
+UNION
+SELECT
+	cast(fimplus.date AS DATE) AS dates,
+	count(DISTINCT fimplus.CustomerID) AS total_key,
+	"FilmPlus" AS Film
+FROM c4_keydrm_log_fimplus_movieid fimplus
+LEFT JOIN c4_keydrm_mv_propertiesshowvn mv ON mv.id = fimplus.MovieID
+WHERE mv.isDRM = 1
+GROUP BY dates
+UNION
+SELECT
+	cast(cs.date AS DATE) AS dates,
+	count(DISTINCT cs.customerid) AS total_key,
+	'PhimGoi' AS Film
+FROM c4_keydrm_customerservice cs
+LEFT JOIN c4_keydrm_log_get_drm_list gets ON gets.customerid = cs.customerid
+GROUP BY dates
